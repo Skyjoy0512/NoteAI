@@ -37,13 +37,27 @@ class DependencyContainer {
         WhisperKitService()
     }()
     
-    // MARK: - Future Services (Phase 4+)
+    // MARK: - Phase 4 Services
+    lazy var apiKeyManager: APIKeyManagerProtocol = {
+        APIKeyManager()
+    }()
+    
+    lazy var apiUsageTracker: APIUsageTrackerProtocol = {
+        APIUsageTracker()
+    }()
+    
+    lazy var llmService: LLMServiceProtocol = {
+        LLMService()
+    }()
+    
+    lazy var subscriptionService: SubscriptionServiceProtocol = {
+        SubscriptionService()
+    }()
+    
+    // MARK: - Future Services (Phase 5+)
     // These services will be implemented in later phases:
-    // - apiKeyManager: APIKeyManagerProtocol
-    // - apiUsageTracker: APIUsageTrackerProtocol  
-    // - llmService: LLMServiceProtocol
-    // - subscriptionService: SubscriptionServiceProtocol
     // - searchService: SearchServiceProtocol
+    // - ragService: RAGServiceProtocol
     
     // MARK: - UseCase Factories
     func makeRecordingUseCase() -> RecordingUseCaseProtocol {
@@ -57,7 +71,7 @@ class DependencyContainer {
     func makeTranscriptionUseCase() -> TranscriptionUseCaseProtocol {
         return TranscriptionUseCase(
             whisperKitService: whisperKitService,
-            apiTranscriptionService: apiTranscriptionService,
+            llmService: llmService,
             subscriptionService: subscriptionService,
             recordingRepository: recordingRepository
         )
@@ -70,10 +84,17 @@ class DependencyContainer {
         )
     }
     
-    // MARK: - Future UseCases (Phase 4+)
+    // MARK: - Phase 4 UseCases
+    func makeSubscriptionUseCase() -> SubscriptionUseCaseProtocol {
+        return SubscriptionUseCase(
+            subscriptionService: subscriptionService,
+            apiUsageTracker: apiUsageTracker
+        )
+    }
+    
+    // MARK: - Future UseCases (Phase 5+)
     // These use cases will be implemented in later phases:
-    // - makeProjectAIUseCase() -> ProjectAIUseCaseProtocol  
-    // - makeSubscriptionUseCase() -> SubscriptionUseCaseProtocol
+    // - makeProjectAIUseCase() -> ProjectAIUseCaseProtocol
     
     // MARK: - ViewModel Factories
     func makeRecordingViewModel() -> RecordingViewModel {
@@ -98,25 +119,59 @@ class DependencyContainer {
         )
     }
     
-    // MARK: - Future ViewModels (Phase 4+)
+    // MARK: - Phase 4 ViewModels
+    func makeSettingsViewModel() -> SettingsViewModel {
+        return SettingsViewModel(
+            subscriptionService: subscriptionService,
+            apiKeyManager: apiKeyManager,
+            usageTracker: apiUsageTracker
+        )
+    }
+    
+    func makeAPIKeySettingsViewModel() -> APIKeySettingsViewModel {
+        return APIKeySettingsViewModel(
+            apiKeyManager: apiKeyManager
+        )
+    }
+    
+    func makeSubscriptionViewModel() -> SubscriptionViewModel {
+        return SubscriptionViewModel(
+            subscriptionService: subscriptionService
+        )
+    }
+    
+    func makeUsageMonitorViewModel() -> UsageMonitorViewModel {
+        return UsageMonitorViewModel(
+            usageTracker: apiUsageTracker
+        )
+    }
+    
+    // MARK: - Future ViewModels (Phase 5+)
     // These view models will be implemented in later phases:
-    // - makeSettingsViewModel() -> SettingsViewModel
+    // - makeProjectAIViewModel() -> ProjectAIViewModel
     
     // MARK: - Additional Services (Lazy Initialization)
     private lazy var audioFileManager: AudioFileManagerProtocol = {
         AudioFileManager()
     }()
     
-    // TODO: These services will be implemented in Phase 4
-    private lazy var apiTranscriptionService: APITranscriptionServiceProtocol = {
-        // Temporary mock implementation
-        return MockAPITranscriptionService()
-    }()
-    
-    private lazy var subscriptionService: SubscriptionServiceProtocol = {
-        // Temporary mock implementation  
-        return MockSubscriptionService()
-    }()
+    // MARK: - Configuration and Initialization
+    func configure() async throws {
+        // Configure API Usage Tracker with database
+        try await apiUsageTracker.configure(database: nil) // TODO: Set up GRDB database
+        
+        // Configure LLM Service
+        try await llmService.configure(
+            apiKeyManager: apiKeyManager,
+            usageTracker: apiUsageTracker
+        )
+        
+        // Configure Subscription Service
+        try await subscriptionService.configure(
+            apiKey: "your_revenuecat_key", // TODO: Add actual RevenueCat key
+            appUserID: nil
+        )
+    }
 }
 
     // MARK: - Future Implementation Notes
