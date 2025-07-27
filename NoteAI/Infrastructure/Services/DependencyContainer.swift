@@ -63,9 +63,15 @@ class DependencyContainer {
         )
     }
     
-    // MARK: - Future UseCases (Phase 3+)
+    func makeProjectUseCase() -> ProjectUseCaseProtocol {
+        return ProjectUseCase(
+            projectRepository: projectRepository,
+            recordingRepository: recordingRepository
+        )
+    }
+    
+    // MARK: - Future UseCases (Phase 4+)
     // These use cases will be implemented in later phases:
-    // - makeProjectUseCase() -> ProjectUseCaseProtocol
     // - makeProjectAIUseCase() -> ProjectAIUseCaseProtocol  
     // - makeSubscriptionUseCase() -> SubscriptionUseCaseProtocol
     
@@ -78,10 +84,22 @@ class DependencyContainer {
         )
     }
     
-    // MARK: - Future ViewModels (Phase 3+)
+    func makeProjectListViewModel() -> ProjectListViewModel {
+        return ProjectListViewModel(
+            projectUseCase: makeProjectUseCase()
+        )
+    }
+    
+    func makeProjectDetailViewModel(project: Project) -> ProjectDetailViewModel {
+        return ProjectDetailViewModel(
+            project: project,
+            projectUseCase: makeProjectUseCase(),
+            recordingRepository: recordingRepository
+        )
+    }
+    
+    // MARK: - Future ViewModels (Phase 4+)
     // These view models will be implemented in later phases:
-    // - makeProjectListViewModel() -> ProjectListViewModel
-    // - makeProjectDetailViewModel(project:) -> ProjectDetailViewModel
     // - makeSettingsViewModel() -> SettingsViewModel
     
     // MARK: - Additional Services (Lazy Initialization)
