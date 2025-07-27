@@ -98,41 +98,8 @@ struct CreateProjectView: View {
         }
     }
     
-    @ViewBuilder
     private var coverImageView: some View {
-        if let imageData = coverImageData,
-           let uiImage = UIImage(data: imageData) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 200)
-                .frame(maxWidth: .infinity)
-                .clipped()
-                .cornerRadius(12)
-        } else {
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.blue.opacity(0.3), Color.purple.opacity(0.3)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(height: 200)
-                .frame(maxWidth: .infinity)
-                .cornerRadius(12)
-                .overlay {
-                    VStack(spacing: 8) {
-                        Image(systemName: "photo")
-                            .font(.system(size: 32))
-                            .foregroundColor(.gray)
-                        
-                        Text("カバー画像を選択")
-                            .font(.subheadline)
-                            .foregroundColor(.gray)
-                    }
-                }
-        }
+        CoverImageView.fullWidth(imageData: coverImageData, height: 200)
     }
     
     // MARK: - Project Info Section
@@ -155,9 +122,9 @@ struct CreateProjectView: View {
                     .disabled(isCreating)
                 
                 HStack {
-                    Text("\(projectName.count)/100")
+                    Text("\(projectName.count)/\(AppConfiguration.Project.maxNameLength)")
                         .font(.caption)
-                        .foregroundColor(projectName.count > 100 ? .red : .secondary)
+                        .foregroundColor(projectName.count > AppConfiguration.Project.maxNameLength ? .red : .secondary)
                     
                     Spacer()
                 }
@@ -188,9 +155,9 @@ struct CreateProjectView: View {
                 }
                 
                 HStack {
-                    Text("\(projectDescription.count)/500")
+                    Text("\(projectDescription.count)/\(AppConfiguration.Project.maxDescriptionLength)")
                         .font(.caption)
-                        .foregroundColor(projectDescription.count > 500 ? .red : .secondary)
+                        .foregroundColor(projectDescription.count > AppConfiguration.Project.maxDescriptionLength ? .red : .secondary)
                     
                     Spacer()
                 }
@@ -227,9 +194,8 @@ struct CreateProjectView: View {
     // MARK: - Computed Properties
     
     private var canCreateProject: Bool {
-        !projectName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        projectName.count <= 100 &&
-        projectDescription.count <= 500
+        ValidationHelper.validateProjectName(projectName) &&
+        ValidationHelper.validateProjectDescription(projectDescription)
     }
     
     // MARK: - Methods
@@ -258,16 +224,16 @@ struct CreateProjectView: View {
         
         do {
             if let data = try await selectedPhoto.loadTransferable(type: Data.self) {
-                // 画像サイズを制限（5MBまで）
-                if data.count > 5 * 1024 * 1024 {
-                    errorMessage = "画像サイズが大きすぎます。5MB以下の画像を選択してください。"
+                // 画像サイズを制限
+                if !ValidationHelper.validateImageSize(data) {
+                    errorMessage = "画像サイズが大きすぎます。\(AppConfiguration.Image.maxFileSize / (1024 * 1024))MB以下の画像を選択してください。"
                     showError = true
                     return
                 }
                 
                 // 画像をリサイズ
                 if let uiImage = UIImage(data: data),
-                   let resizedData = resizeImage(uiImage, maxSize: CGSize(width: 800, height: 600)) {
+                   let resizedData = resizeImage(uiImage, maxSize: AppConfiguration.Image.maxDimensions) {
                     coverImageData = resizedData
                 } else {
                     coverImageData = data
@@ -297,6 +263,6 @@ struct CreateProjectView: View {
         let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         
-        return resizedImage?.jpegData(compressionQuality: 0.8)
+        return resizedImage?.jpegData(compressionQuality: AppConfiguration.Image.compressionQuality)
     }
 }

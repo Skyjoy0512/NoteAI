@@ -3,7 +3,7 @@ import Combine
 import Foundation
 
 @MainActor
-class ProjectListViewModel: ObservableObject {
+class ProjectListViewModel: ViewModelCapable {
     // MARK: - Published Properties
     @Published var projects: [Project] = []
     @Published var isLoading = false
@@ -39,11 +39,7 @@ class ProjectListViewModel: ObservableObject {
     }
     
     func refreshProjects() async {
-        isLoading = true
-        errorMessage = nil
-        showError = false
-        
-        do {
+        await withLoadingNoReturn {
             let fetchedProjects: [Project]
             
             if searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -53,12 +49,7 @@ class ProjectListViewModel: ObservableObject {
             }
             
             projects = sortProjects(fetchedProjects)
-            
-        } catch {
-            await handleError(error)
         }
-        
-        isLoading = false
     }
     
     func createProject(name: String, description: String?, coverImageData: Data?) async {
@@ -127,7 +118,7 @@ class ProjectListViewModel: ObservableObject {
     
     private func setupSearchBinding() {
         $searchText
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .debounce(for: .milliseconds(Int(AppConfiguration.UI.searchDebounceDelay * 1000)), scheduler: RunLoop.main)
             .sink { [weak self] _ in
                 Task { @MainActor in
                     await self?.refreshProjects()
@@ -149,16 +140,7 @@ class ProjectListViewModel: ObservableObject {
         }
     }
     
-    private func handleError(_ error: Error) async {
-        await MainActor.run {
-            if let noteAIError = error as? NoteAIError {
-                errorMessage = noteAIError.userMessage
-            } else {
-                errorMessage = error.localizedDescription
-            }
-            showError = true
-        }
-    }
+    // handleError\u306f\u30d7\u30ed\u30c8\u30b3\u30eb\u3067\u5b9f\u88c5\u6e08\u307f
     
     // MARK: - Computed Properties
     

@@ -275,33 +275,8 @@ struct ProjectCard: View {
         )
     }
     
-    @ViewBuilder
     private var coverImageView: some View {
-        if let imageData = project.coverImageData,
-           let uiImage = UIImage(data: imageData) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 80)
-                .clipped()
-                .cornerRadius(8)
-        } else {
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(height: 80)
-                .cornerRadius(8)
-                .overlay {
-                    Image(systemName: "folder")
-                        .font(.system(size: 24))
-                        .foregroundColor(.white.opacity(0.8))
-                }
-        }
+        CoverImageView.cardSize(imageData: project.coverImageData)
     }
 }
 
@@ -342,33 +317,8 @@ struct ProjectRow: View {
         .padding(.vertical, 8)
     }
     
-    @ViewBuilder
     private var coverImageView: some View {
-        if let imageData = project.coverImageData,
-           let uiImage = UIImage(data: imageData) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 60, height: 60)
-                .clipped()
-                .cornerRadius(8)
-        } else {
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.6)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .frame(width: 60, height: 60)
-                .cornerRadius(8)
-                .overlay {
-                    Image(systemName: "folder")
-                        .font(.system(size: 20))
-                        .foregroundColor(.white.opacity(0.8))
-                }
-        }
+        CoverImageView.rowSize(imageData: project.coverImageData)
     }
 }
 
@@ -376,18 +326,6 @@ struct ProjectRow: View {
 
 extension Project {
     var formattedCreatedAt: String {
-        let formatter = DateFormatter()
-        let calendar = Calendar.current
-        
-        if calendar.isDateInToday(createdAt) {
-            formatter.timeStyle = .short
-            return "今日 \(formatter.string(from: createdAt))"
-        } else if calendar.isDateInYesterday(createdAt) {
-            formatter.timeStyle = .short
-            return "昨日 \(formatter.string(from: createdAt))"
-        } else {
-            formatter.dateStyle = .medium
-            return formatter.string(from: createdAt)
-        }
+        DateFormattingService.shared.formatCreatedAt(createdAt)
     }
 }
