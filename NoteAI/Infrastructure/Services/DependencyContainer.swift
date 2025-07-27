@@ -76,7 +76,8 @@ class DependencyContainer {
         return TranscriptionUseCase(
             whisperKitService: whisperKitService,
             apiTranscriptionService: apiTranscriptionService,
-            subscriptionService: subscriptionService
+            subscriptionService: subscriptionService,
+            recordingRepository: recordingRepository
         )
     }
     
@@ -152,28 +153,19 @@ class DependencyContainer {
     }()
 }
 
-// MARK: - Protocol Definitions (Placeholders)
-protocol AudioServiceProtocol {}
-protocol WhisperKitServiceProtocol {}
+// MARK: - Additional Service Protocols (will be implemented in Phase 4)
 protocol APIKeyManagerProtocol {}
 protocol APIUsageTrackerProtocol {}
 protocol LLMServiceProtocol {}
-protocol SubscriptionServiceProtocol {}
 protocol SearchServiceProtocol {}
-protocol AudioFileManagerProtocol {}
-protocol APITranscriptionServiceProtocol {}
 protocol RAGServiceProtocol {}
 
-// MARK: - UseCase Protocol Definitions (Placeholders)
-protocol RecordingUseCaseProtocol {}
-protocol TranscriptionUseCaseProtocol {}
+// MARK: - UseCase Protocol Definitions (will be implemented in Phase 3-4)
 protocol ProjectUseCaseProtocol {}
 protocol ProjectAIUseCaseProtocol {}
 protocol SubscriptionUseCaseProtocol {}
 
-// MARK: - Service Implementations (Placeholders)
-class AudioService: AudioServiceProtocol {}
-class WhisperKitService: WhisperKitServiceProtocol {}
+// MARK: - Service Implementations (Phase 4 implementation)
 class APIKeyManager: APIKeyManagerProtocol {}
 class APIUsageTracker: APIUsageTrackerProtocol {
     init(repository: APIUsageRepositoryProtocol, notificationCenter: NotificationCenter) {}
@@ -181,25 +173,12 @@ class APIUsageTracker: APIUsageTrackerProtocol {
 class LLMService: LLMServiceProtocol {
     init(apiKeyManager: APIKeyManagerProtocol, usageTracker: APIUsageTrackerProtocol) {}
 }
-class SubscriptionService: SubscriptionServiceProtocol {
-    init(repository: SubscriptionRepositoryProtocol) {}
-}
 class SearchService: SearchServiceProtocol {}
-class AudioFileManager: AudioFileManagerProtocol {}
-class APITranscriptionService: APITranscriptionServiceProtocol {
-    init(apiKeyManager: APIKeyManagerProtocol, usageTracker: APIUsageTrackerProtocol) {}
-}
 class RAGService: RAGServiceProtocol {
     init(searchService: SearchServiceProtocol) {}
 }
 
-// MARK: - UseCase Implementations (Placeholders)
-class RecordingUseCase: RecordingUseCaseProtocol {
-    init(audioService: AudioServiceProtocol, recordingRepository: RecordingRepositoryProtocol, fileManager: AudioFileManagerProtocol) {}
-}
-class TranscriptionUseCase: TranscriptionUseCaseProtocol {
-    init(whisperKitService: WhisperKitServiceProtocol, apiTranscriptionService: APITranscriptionServiceProtocol, subscriptionService: SubscriptionServiceProtocol) {}
-}
+// MARK: - UseCase Implementations (Phase 3-4 implementation)
 class ProjectUseCase: ProjectUseCaseProtocol {
     init(projectRepository: ProjectRepositoryProtocol, recordingRepository: RecordingRepositoryProtocol) {}
 }
@@ -210,56 +189,13 @@ class SubscriptionUseCase: SubscriptionUseCaseProtocol {
     init(subscriptionService: SubscriptionServiceProtocol, subscriptionRepository: SubscriptionRepositoryProtocol) {}
 }
 
-// MARK: - Repository Implementations (Placeholders)
-class ProjectRepository: ProjectRepositoryProtocol {
-    init(coreDataStack: CoreDataStack) {}
-    func save(_ project: Project) async throws {}
-    func findById(_ id: UUID) async throws -> Project? { return nil }
-    func findAll() async throws -> [Project] { return [] }
-    func delete(_ id: UUID) async throws {}
-    func findByIds(_ ids: [UUID]) async throws -> [Project] { return [] }
-    func search(query: String) async throws -> [Project] { return [] }
-}
+// Note: Repository implementations are in their respective files:
+// - ProjectRepository in /Infrastructure/Repositories/ProjectRepository.swift
+// - RecordingRepository in /Infrastructure/Repositories/RecordingRepository.swift  
+// - SubscriptionRepository in /Infrastructure/Repositories/SubscriptionRepository.swift
+// - APIUsageRepository in /Infrastructure/Repositories/APIUsageRepository.swift
 
-class RecordingRepository: RecordingRepositoryProtocol {
-    init(coreDataStack: CoreDataStack) {}
-    func save(_ recording: Recording) async throws {}
-    func findById(_ id: UUID) async throws -> Recording? { return nil }
-    func findByProjectId(_ projectId: UUID) async throws -> [Recording] { return [] }
-    func findAll() async throws -> [Recording] { return [] }
-    func delete(_ id: UUID) async throws {}
-    func search(query: String) async throws -> [Recording] { return [] }
-    func findRecent(limit: Int) async throws -> [Recording] { return [] }
-}
-
-class SubscriptionRepository: SubscriptionRepositoryProtocol {
-    init(coreDataStack: CoreDataStack) {}
-    func save(_ subscription: Subscription) async throws {}
-    func findCurrent() async throws -> Subscription? { return nil }
-    func findAll() async throws -> [Subscription] { return [] }
-}
-
-class APIUsageRepository: APIUsageRepositoryProtocol {
-    init(coreDataStack: CoreDataStack) {}
-    func save(_ usage: APIUsage) async throws {}
-    func findUsages(provider: LLMProvider, from: Date, to: Date) async throws -> [APIUsage] { return [] }
-    func getMonthlyUsage(provider: LLMProvider, month: String) async throws -> [APIUsage] { return [] }
-    func getTotalMonthlyCost(month: String) async throws -> Double { return 0 }
-}
-
-// MARK: - ViewModel Implementations (Placeholders)
-class RecordingViewModel: ObservableObject {
-    init(recordingUseCase: RecordingUseCaseProtocol, transcriptionUseCase: TranscriptionUseCaseProtocol, projectRepository: ProjectRepositoryProtocol) {}
-}
-
-class ProjectListViewModel: ObservableObject {
-    init(projectUseCase: ProjectUseCaseProtocol) {}
-}
-
-class ProjectDetailViewModel: ObservableObject {
-    init(project: Project, projectRepository: ProjectRepositoryProtocol, recordingRepository: RecordingRepositoryProtocol, projectAIUseCase: ProjectAIUseCaseProtocol) {}
-}
-
-class SettingsViewModel: ObservableObject {
-    init(subscriptionUseCase: SubscriptionUseCaseProtocol, apiKeyManager: APIKeyManagerProtocol, apiUsageTracker: APIUsageTrackerProtocol) {}
-}
+// Note: ViewModel implementations will be in /Presentation/ViewModels/ directory
+// - RecordingViewModel in Phase 2 completion
+// - ProjectListViewModel, ProjectDetailViewModel in Phase 3  
+// - SettingsViewModel in Phase 4
