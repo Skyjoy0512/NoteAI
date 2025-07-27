@@ -1,8 +1,8 @@
 import Foundation
 import CoreData
 
-class ProjectRepository: ProjectRepositoryProtocol {
-    private let coreDataStack: CoreDataStack
+class ProjectRepository: ProjectRepositoryProtocol, CoreDataRepository {
+    let coreDataStack: CoreDataStack
     
     init(coreDataStack: CoreDataStack) {
         self.coreDataStack = coreDataStack
@@ -83,20 +83,6 @@ class ProjectRepository: ProjectRepositoryProtocol {
     }
     
     // MARK: - Private Methods
-    
-    private func withContext<T>(_ operation: @escaping (NSManagedObjectContext) throws -> T) async throws -> T {
-        return try await withCheckedThrowingContinuation { continuation in
-            let context = coreDataStack.newBackgroundContext()
-            context.perform {
-                do {
-                    let result = try operation(context)
-                    continuation.resume(returning: result)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
     
     private func findOrCreateEntity(for project: Project, in context: NSManagedObjectContext) throws -> ProjectEntity {
         let request: NSFetchRequest<ProjectEntity> = ProjectEntity.fetchRequest()

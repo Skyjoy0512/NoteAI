@@ -37,31 +37,13 @@ class DependencyContainer {
         WhisperKitService()
     }()
     
-    lazy var apiKeyManager: APIKeyManagerProtocol = {
-        APIKeyManager()
-    }()
-    
-    lazy var apiUsageTracker: APIUsageTrackerProtocol = {
-        APIUsageTracker(
-            repository: apiUsageRepository,
-            notificationCenter: .default
-        )
-    }()
-    
-    lazy var llmService: LLMServiceProtocol = {
-        LLMService(
-            apiKeyManager: apiKeyManager,
-            usageTracker: apiUsageTracker
-        )
-    }()
-    
-    lazy var subscriptionService: SubscriptionServiceProtocol = {
-        SubscriptionService(repository: subscriptionRepository)
-    }()
-    
-    lazy var searchService: SearchServiceProtocol = {
-        SearchService()
-    }()
+    // MARK: - Future Services (Phase 4+)
+    // These services will be implemented in later phases:
+    // - apiKeyManager: APIKeyManagerProtocol
+    // - apiUsageTracker: APIUsageTrackerProtocol  
+    // - llmService: LLMServiceProtocol
+    // - subscriptionService: SubscriptionServiceProtocol
+    // - searchService: SearchServiceProtocol
     
     // MARK: - UseCase Factories
     func makeRecordingUseCase() -> RecordingUseCaseProtocol {
@@ -81,28 +63,11 @@ class DependencyContainer {
         )
     }
     
-    func makeProjectUseCase() -> ProjectUseCaseProtocol {
-        return ProjectUseCase(
-            projectRepository: projectRepository,
-            recordingRepository: recordingRepository
-        )
-    }
-    
-    func makeProjectAIUseCase() -> ProjectAIUseCaseProtocol {
-        return ProjectAIUseCase(
-            projectRepository: projectRepository,
-            llmService: llmService,
-            ragService: ragService,
-            subscriptionService: subscriptionService
-        )
-    }
-    
-    func makeSubscriptionUseCase() -> SubscriptionUseCaseProtocol {
-        return SubscriptionUseCase(
-            subscriptionService: subscriptionService,
-            subscriptionRepository: subscriptionRepository
-        )
-    }
+    // MARK: - Future UseCases (Phase 3+)
+    // These use cases will be implemented in later phases:
+    // - makeProjectUseCase() -> ProjectUseCaseProtocol
+    // - makeProjectAIUseCase() -> ProjectAIUseCaseProtocol  
+    // - makeSubscriptionUseCase() -> SubscriptionUseCaseProtocol
     
     // MARK: - ViewModel Factories
     func makeRecordingViewModel() -> RecordingViewModel {
@@ -113,89 +78,42 @@ class DependencyContainer {
         )
     }
     
-    func makeProjectListViewModel() -> ProjectListViewModel {
-        return ProjectListViewModel(
-            projectUseCase: makeProjectUseCase()
-        )
-    }
-    
-    func makeProjectDetailViewModel(project: Project) -> ProjectDetailViewModel {
-        return ProjectDetailViewModel(
-            project: project,
-            projectRepository: projectRepository,
-            recordingRepository: recordingRepository,
-            projectAIUseCase: makeProjectAIUseCase()
-        )
-    }
-    
-    func makeSettingsViewModel() -> SettingsViewModel {
-        return SettingsViewModel(
-            subscriptionUseCase: makeSubscriptionUseCase(),
-            apiKeyManager: apiKeyManager,
-            apiUsageTracker: apiUsageTracker
-        )
-    }
+    // MARK: - Future ViewModels (Phase 3+)
+    // These view models will be implemented in later phases:
+    // - makeProjectListViewModel() -> ProjectListViewModel
+    // - makeProjectDetailViewModel(project:) -> ProjectDetailViewModel
+    // - makeSettingsViewModel() -> SettingsViewModel
     
     // MARK: - Additional Services (Lazy Initialization)
     private lazy var audioFileManager: AudioFileManagerProtocol = {
         AudioFileManager()
     }()
     
+    // TODO: These services will be implemented in Phase 4
     private lazy var apiTranscriptionService: APITranscriptionServiceProtocol = {
-        APITranscriptionService(
-            apiKeyManager: apiKeyManager,
-            usageTracker: apiUsageTracker
-        )
+        // Temporary mock implementation
+        return MockAPITranscriptionService()
     }()
     
-    private lazy var ragService: RAGServiceProtocol = {
-        RAGService(searchService: searchService)
+    private lazy var subscriptionService: SubscriptionServiceProtocol = {
+        // Temporary mock implementation  
+        return MockSubscriptionService()
     }()
 }
 
-// MARK: - Additional Service Protocols (will be implemented in Phase 4)
-protocol APIKeyManagerProtocol {}
-protocol APIUsageTrackerProtocol {}
-protocol LLMServiceProtocol {}
-protocol SearchServiceProtocol {}
-protocol RAGServiceProtocol {}
-
-// MARK: - UseCase Protocol Definitions (will be implemented in Phase 3-4)
-protocol ProjectUseCaseProtocol {}
-protocol ProjectAIUseCaseProtocol {}
-protocol SubscriptionUseCaseProtocol {}
-
-// MARK: - Service Implementations (Phase 4 implementation)
-class APIKeyManager: APIKeyManagerProtocol {}
-class APIUsageTracker: APIUsageTrackerProtocol {
-    init(repository: APIUsageRepositoryProtocol, notificationCenter: NotificationCenter) {}
-}
-class LLMService: LLMServiceProtocol {
-    init(apiKeyManager: APIKeyManagerProtocol, usageTracker: APIUsageTrackerProtocol) {}
-}
-class SearchService: SearchServiceProtocol {}
-class RAGService: RAGServiceProtocol {
-    init(searchService: SearchServiceProtocol) {}
-}
-
-// MARK: - UseCase Implementations (Phase 3-4 implementation)
-class ProjectUseCase: ProjectUseCaseProtocol {
-    init(projectRepository: ProjectRepositoryProtocol, recordingRepository: RecordingRepositoryProtocol) {}
-}
-class ProjectAIUseCase: ProjectAIUseCaseProtocol {
-    init(projectRepository: ProjectRepositoryProtocol, llmService: LLMServiceProtocol, ragService: RAGServiceProtocol, subscriptionService: SubscriptionServiceProtocol) {}
-}
-class SubscriptionUseCase: SubscriptionUseCaseProtocol {
-    init(subscriptionService: SubscriptionServiceProtocol, subscriptionRepository: SubscriptionRepositoryProtocol) {}
-}
-
-// Note: Repository implementations are in their respective files:
-// - ProjectRepository in /Infrastructure/Repositories/ProjectRepository.swift
-// - RecordingRepository in /Infrastructure/Repositories/RecordingRepository.swift  
-// - SubscriptionRepository in /Infrastructure/Repositories/SubscriptionRepository.swift
-// - APIUsageRepository in /Infrastructure/Repositories/APIUsageRepository.swift
-
-// Note: ViewModel implementations will be in /Presentation/ViewModels/ directory
-// - RecordingViewModel in Phase 2 completion
-// - ProjectListViewModel, ProjectDetailViewModel in Phase 3  
-// - SettingsViewModel in Phase 4
+    // MARK: - Future Implementation Notes
+    // The following components will be implemented in subsequent phases:
+    // 
+    // Phase 3:
+    // - ProjectUseCase: Project management business logic
+    // - ProjectListViewModel, ProjectDetailViewModel: Project UI components
+    // 
+    // Phase 4:
+    // - APIKeyManager: API key secure storage and management
+    // - LLMService: External AI service integration
+    // - SubscriptionService: Premium feature management
+    // - SettingsViewModel: App configuration UI
+    // 
+    // Phase 5:
+    // - RAGService: Advanced search and AI analysis
+    // - ProjectAIUseCase: AI-powered project insights

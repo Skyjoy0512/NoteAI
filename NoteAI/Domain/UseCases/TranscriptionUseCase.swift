@@ -248,36 +248,7 @@ enum TranscriptionUseCaseError: LocalizedError {
     }
 }
 
-// MARK: - Mock Implementation for API Transcription Service
-
-protocol APITranscriptionServiceProtocol {
-    func transcribe(audioURL: URL, provider: LLMProvider, language: String) async throws -> TranscriptionResult
-}
-
-class APITranscriptionService: APITranscriptionServiceProtocol {
-    init(apiKeyManager: APIKeyManagerProtocol, usageTracker: APIUsageTrackerProtocol) {
-        // TODO: 実装
-    }
-    
-    func transcribe(audioURL: URL, provider: LLMProvider, language: String) async throws -> TranscriptionResult {
-        // TODO: 実際のAPI統合（Phase 4で実装）
-        throw TranscriptionUseCaseError.subscriptionRequired
-    }
-}
-
-// MARK: - Mock Implementation for Subscription Service
-
-protocol SubscriptionServiceProtocol {
-    func hasActiveSubscription() async -> Bool
-}
-
-class SubscriptionService: SubscriptionServiceProtocol {
-    init(repository: SubscriptionRepositoryProtocol) {
-        // TODO: 実装
-    }
-    
-    func hasActiveSubscription() async -> Bool {
-        // TODO: 実際のサブスクリプション確認（Phase 4で実装）
-        return false
-    }
-}
+// Note: Service protocols and implementations moved to appropriate files:
+// - APITranscriptionServiceProtocol: Will be defined in Phase 4
+// - SubscriptionServiceProtocol: Will be defined in Phase 4
+// - Mock implementations: Available in MockServices.swift

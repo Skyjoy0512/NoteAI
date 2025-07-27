@@ -1,8 +1,8 @@
 import Foundation
 import CoreData
 
-class APIUsageRepository: APIUsageRepositoryProtocol {
-    private let coreDataStack: CoreDataStack
+class APIUsageRepository: APIUsageRepositoryProtocol, CoreDataRepository {
+    let coreDataStack: CoreDataStack
     
     init(coreDataStack: CoreDataStack) {
         self.coreDataStack = coreDataStack
@@ -147,20 +147,6 @@ class APIUsageRepository: APIUsageRepositoryProtocol {
     
     // MARK: - Private Methods
     
-    private func withContext<T>(_ operation: @escaping (NSManagedObjectContext) throws -> T) async throws -> T {
-        return try await withCheckedThrowingContinuation { continuation in
-            let context = coreDataStack.newBackgroundContext()
-            context.perform {
-                do {
-                    let result = try operation(context)
-                    continuation.resume(returning: result)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
-    
     private func findOrCreateEntity(for usage: APIUsage, in context: NSManagedObjectContext) throws -> APIUsageEntity {
         let request: NSFetchRequest<APIUsageEntity> = APIUsageEntity.fetchRequest()
         request.predicate = NSPredicate(format: "id == %@", usage.id as CVarArg)
@@ -272,18 +258,4 @@ struct APIUsageSummary {
     }
 }
 
-// MARK: - Mock LLMProvider for compilation
-
-struct MockLLMProvider: LLMProvider {
-    let identifier: String
-    
-    var keychainIdentifier: String { identifier }
-    var displayName: String { identifier }
-    var baseURL: String { "" }
-    var defaultModel: String { "" }
-    var supportedModels: [String] { [] }
-    
-    func estimateCost(tokens: Int32, operation: APIOperationType) -> Double {
-        return 0.0
-    }
-}
+// Note: MockLLMProvider moved to MockServices.swift

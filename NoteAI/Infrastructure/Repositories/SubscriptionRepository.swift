@@ -1,8 +1,8 @@
 import Foundation
 import CoreData
 
-class SubscriptionRepository: SubscriptionRepositoryProtocol {
-    private let coreDataStack: CoreDataStack
+class SubscriptionRepository: SubscriptionRepositoryProtocol, CoreDataRepository {
+    let coreDataStack: CoreDataStack
     
     init(coreDataStack: CoreDataStack) {
         self.coreDataStack = coreDataStack
@@ -98,20 +98,6 @@ class SubscriptionRepository: SubscriptionRepositoryProtocol {
     }
     
     // MARK: - Private Methods
-    
-    private func withContext<T>(_ operation: @escaping (NSManagedObjectContext) throws -> T) async throws -> T {
-        return try await withCheckedThrowingContinuation { continuation in
-            let context = coreDataStack.newBackgroundContext()
-            context.perform {
-                do {
-                    let result = try operation(context)
-                    continuation.resume(returning: result)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
     
     private func findOrCreateEntity(for subscription: Subscription, in context: NSManagedObjectContext) throws -> SubscriptionEntity {
         let request: NSFetchRequest<SubscriptionEntity> = SubscriptionEntity.fetchRequest()

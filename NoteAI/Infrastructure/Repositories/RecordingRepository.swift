@@ -1,8 +1,8 @@
 import Foundation
 import CoreData
 
-class RecordingRepository: RecordingRepositoryProtocol {
-    private let coreDataStack: CoreDataStack
+class RecordingRepository: RecordingRepositoryProtocol, CoreDataRepository {
+    let coreDataStack: CoreDataStack
     
     init(coreDataStack: CoreDataStack) {
         self.coreDataStack = coreDataStack
@@ -96,20 +96,6 @@ class RecordingRepository: RecordingRepositoryProtocol {
     }
     
     // MARK: - Private Methods
-    
-    private func withContext<T>(_ operation: @escaping (NSManagedObjectContext) throws -> T) async throws -> T {
-        return try await withCheckedThrowingContinuation { continuation in
-            let context = coreDataStack.newBackgroundContext()
-            context.perform {
-                do {
-                    let result = try operation(context)
-                    continuation.resume(returning: result)
-                } catch {
-                    continuation.resume(throwing: error)
-                }
-            }
-        }
-    }
     
     private func findOrCreateEntity(for recording: Recording, in context: NSManagedObjectContext) throws -> RecordingEntity {
         let request: NSFetchRequest<RecordingEntity> = RecordingEntity.fetchRequest()
