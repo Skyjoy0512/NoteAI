@@ -54,10 +54,33 @@ class DependencyContainer {
         SubscriptionService()
     }()
     
+    // MARK: - Phase 5 Services
+    lazy var embeddingService: EmbeddingServiceProtocol = {
+        EmbeddingService(
+            llmService: llmService,
+            apiKeyManager: apiKeyManager
+        )
+    }()
+    
+    lazy var vectorStore: VectorStoreProtocol = {
+        // TODO: Replace with proper GRDB DatabaseWriter when implemented
+        VectorStore(database: createMockDatabaseWriter())
+    }()
+    
+    lazy var ragService: RAGServiceProtocol = {
+        RAGService(
+            llmService: llmService,
+            database: createMockDatabaseWriter(),
+            embeddingService: embeddingService,
+            vectorStore: vectorStore,
+            chunkingService: TextChunkingService()
+        )
+    }()
+    
     // MARK: - Future Services (Phase 5+)
     // These services will be implemented in later phases:
-    // - searchService: SearchServiceProtocol
-    // - ragService: RAGServiceProtocol
+    // - searchService: SearchServiceProtocol (enhanced semantic search)
+    // - exportService: ExportServiceProtocol
     
     // MARK: - UseCase Factories
     func makeRecordingUseCase() -> RecordingUseCaseProtocol {
@@ -92,9 +115,19 @@ class DependencyContainer {
         )
     }
     
+    // MARK: - Phase 5 UseCases
+    func makeProjectAIUseCase() -> ProjectAIUseCaseProtocol {
+        return ProjectAIUseCase(
+            ragService: ragService,
+            llmService: llmService,
+            projectRepository: projectRepository,
+            recordingRepository: recordingRepository
+        )
+    }
+    
     // MARK: - Future UseCases (Phase 5+)
     // These use cases will be implemented in later phases:
-    // - makeProjectAIUseCase() -> ProjectAIUseCaseProtocol
+    // - makeExportUseCase() -> ExportUseCaseProtocol
     
     // MARK: - ViewModel Factories
     func makeRecordingViewModel() -> RecordingViewModel {
@@ -146,9 +179,17 @@ class DependencyContainer {
         )
     }
     
+    // MARK: - Phase 5 ViewModels
+    func makeProjectAIViewModel(project: Project) -> ProjectAIViewModel {
+        return ProjectAIViewModel(
+            project: project,
+            projectAIUseCase: makeProjectAIUseCase()
+        )
+    }
+    
     // MARK: - Future ViewModels (Phase 5+)
     // These view models will be implemented in later phases:
-    // - makeProjectAIViewModel() -> ProjectAIViewModel
+    // - makeExportViewModel() -> ExportViewModel
     
     // MARK: - Additional Services (Lazy Initialization)
     private lazy var audioFileManager: AudioFileManagerProtocol = {
@@ -171,6 +212,42 @@ class DependencyContainer {
             apiKey: "your_revenuecat_key", // TODO: Add actual RevenueCat key
             appUserID: nil
         )
+        
+        // Configure Phase 5 Services
+        try await configureRAGServices()
+    }
+    
+    private func configureRAGServices() async throws {
+        // Configure Embedding Service
+        let embeddingConfig = EmbeddingConfiguration(
+            model: .openaiTextEmbedding3Small,
+            maxTokens: 8192,
+            batchSize: 10,
+            timeout: 30.0,
+            retryCount: 3,
+            enableCaching: true,
+            cacheExpiration: 3600,
+            preprocessingOptions: PreprocessingOptions(
+                normalizeWhitespace: true,
+                removeSpecialCharacters: false,
+                lowercaseText: false,
+                removeStopWords: false,
+                stemming: false,
+                maxLength: 8192,
+                minLength: 1
+            )
+        )
+        
+        try await embeddingService.updateConfiguration(embeddingConfig)
+        
+        // Initialize default embedding model
+        try await embeddingService.loadModel(model: .openaiTextEmbedding3Small)
+    }
+    
+    // MARK: - Helper Methods
+    private func createMockDatabaseWriter() -> DatabaseWriter {
+        // TODO: Replace with proper GRDB DatabaseWriter implementation
+        fatalError("GRDB DatabaseWriter not implemented yet")
     }
 }
 
