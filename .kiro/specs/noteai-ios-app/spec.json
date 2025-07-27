@@ -1,0 +1,9 @@
+{
+  "feature": "noteai-ios-app",
+  "description": "iOSネイティブ音声録音・文字起こし・AI分析アプリ - プロジェクト管理とAPI連携機能付き",
+  "requirements": true,
+  "design": true,
+  "tasks": true,
+  "created_at": "2025-01-27T19:15:00Z",
+  "updated_at": "2025-01-27T20:00:00Z"
+}

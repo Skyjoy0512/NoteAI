@@ -1,6 +1,6 @@
-# Claude Code Spec-Driven Development
+# NoteAI - Voice Note Processing Application
 
-This project implements Kiro-style Spec-Driven Development for Claude Code using hooks and slash commands.
+NoteAIは音声録音から自動文字起こしと話者分離を行うWebアプリケーションです。このプロジェクトではKiro-style Spec-Driven Developmentを使用して開発を進めます。
 
 ## Project Context
 
@@ -131,9 +131,9 @@ Create specialized steering documents for:
 The `/kiro:steering` command manages these files automatically. Manual updates to this section reflect changes made through steering commands.
 
 ### Active Steering Files
-- `product.md`: Always included - Product context and business objectives
-- `tech.md`: Always included - Technology stack and architectural decisions  
-- `structure.md`: Always included - File organization and code patterns
+- `product.md`: Always included - NoteAI音声処理アプリの製品概要とビジネス目標
+- `tech.md`: Always included - Next.js/Firebase/Cloud Runのアーキテクチャとテクノロジースタック
+- `structure.md`: Always included - プロジェクト構造とコーディング規約
 
 ### Custom Steering Files
 <!-- Added by /kiro:steering-custom command -->

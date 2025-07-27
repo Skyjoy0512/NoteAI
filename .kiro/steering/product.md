@@ -1,43 +1,41 @@
-# Product Overview
+# NoteAI Product Overview
 
-Claude Code Spec-Driven Development is a comprehensive framework that implements Kiro-style specification-driven development workflows within Claude Code using hooks and slash commands.
+## Product Vision
+NoteAIは、音声録音から自動的に文字起こしと話者分離を行い、ユーザーが効率的にメモを管理できるWebアプリケーションです。
 
 ## Core Features
 
-- **3-Phase Approval Workflow**: Requirements → Design → Tasks → Implementation with mandatory human review at each phase
-- **Intelligent Steering System**: Automated creation and maintenance of project knowledge documents (product, tech, structure)
-- **Slash Command Toolset**: 7 specialized commands for managing the complete spec-driven development lifecycle
-- **Automated Progress Tracking**: Hook-based system for monitoring task completion and specification compliance
-- **Multi-language Support**: Complete documentation and configurations in Japanese, English, and Traditional Chinese
-- **Context Preservation**: Smart context management during Claude Code session compression
-- **Project Template System**: Ready-to-use examples and templates for quick project setup
+### 音声処理機能
+- **音声録音**: ブラウザベースの音声録音機能
+- **自動文字起こし**: 高精度な音声認識による自動転写
+- **話者分離**: 複数話者の音声を自動的に識別・分離
+- **音声学習**: ユーザー固有の音声パターン学習機能
 
-## Target Use Case
+### ユーザー体験
+- **リアルタイム処理**: 録音中にリアルタイムで文字起こし表示
+- **編集機能**: 文字起こし結果の手動編集・修正
+- **検索機能**: 過去の音声メモから内容検索
+- **エクスポート**: テキスト、音声ファイルのダウンロード
 
-This framework is designed for software development teams and individual developers who want to:
+### ユーザー管理
+- **認証システム**: Firebase Authenticationによる安全なログイン
+- **デモユーザー**: 体験用デモアカウント機能
+- **ユーザー設定**: 個人設定とAPIキー管理
 
-- **Maintain consistency** across AI-assisted development sessions
-- **Ensure quality** through structured review processes
-- **Track progress** transparently on complex feature development
-- **Preserve project knowledge** through persistent steering documents
-- **Follow systematic development** rather than ad-hoc coding approaches
-- **Integrate AI assistance** into established development workflows
+## Target Users
+- **会議参加者**: 会議の音声記録と議事録作成
+- **学生**: 講義や授業の音声メモ
+- **研究者**: インタビューや調査の音声データ処理
+- **ビジネスユーザー**: 電話会議やプレゼンテーションの記録
 
-The system is particularly valuable for:
-- Complex feature development requiring multiple development sessions
-- Team environments where project knowledge needs to be shared
-- Long-term projects where architectural decisions need documentation
-- Quality-focused development requiring structured review processes
+## Value Proposition
+- 手動での文字起こし作業を自動化
+- 複数話者の発言を正確に分離・識別
+- クラウドベースでどこからでもアクセス可能
+- 高精度な音声認識技術の活用
 
-## Key Value Proposition
-
-**Bridging the gap between Kiro IDE's advanced spec-driven development and Claude Code's powerful AI assistance.** 
-
-The framework provides:
-- **Structured AI Collaboration**: Transforms ad-hoc AI interactions into systematic development processes
-- **Knowledge Persistence**: Maintains project context across sessions through steering documents
-- **Quality Assurance**: Enforces human review at critical development phases
-- **Automation with Control**: Automates routine tasks while preserving human oversight
-- **Proven Methodology**: Implements battle-tested Kiro development patterns in Claude Code environment
-
-This enables developers to achieve the same level of systematic, high-quality development that Kiro users enjoy, while leveraging Claude Code's accessibility and powerful AI capabilities.
+## Success Metrics
+- 文字起こし精度率
+- 話者分離の正確性
+- ユーザー登録数と継続利用率
+- 処理速度とレスポンス時間
