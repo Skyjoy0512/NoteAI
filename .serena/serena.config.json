@@ -1,0 +1,35 @@
+{
+  "project": {
+    "name": "NoteAI",
+    "type": "swift-ios",
+    "root": "..",
+    "languages": ["swift", "objective-c"],
+    "frameworks": ["SwiftUI", "UIKit", "AVFoundation", "Speech"]
+  },
+  "ai": {
+    "model": "claude-3-opus",
+    "features": [
+      "code-generation",
+      "refactoring",
+      "test-generation",
+      "documentation"
+    ]
+  },
+  "indexing": {
+    "include": [
+      "Sources/**/*.swift",
+      "Tests/**/*.swift"
+    ],
+    "exclude": [
+      ".build/**",
+      "DerivedData/**"
+    ]
+  },
+  "tools": {
+    "lsp": {
+      "swift": "sourcekit-lsp"
+    },
+    "formatter": "swift-format",
+    "linter": "swiftlint"
+  }
+}

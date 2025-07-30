@@ -76,3 +76,21 @@ BLOG.md
 .claude/hooks/
 
 docs/kiro/prompt/
+
+# Xcode (Swift Package Manager)
+UserInterfaceState.xcuserstate
+DerivedData/
+.build/
+.swiftpm/
+
+# Swift Package Manager artifacts
+*.xcworkspace/xcuserdata
+Package.resolved
+
+# Xcode crash and diagnostic files
+IDEDistribution.log
+*.xcscmblueprint
+*.xccheckout
+
+# Source Control specific
+*.orig
